@@ -10,10 +10,7 @@ void Waiter::requestChopstick(int philosopherNumber, bool isRight) {
     std::unique_lock<std::mutex> lock(mtx);
     Philosopher& philosopher = philosophers[philosopherNumber];
     auto number = isRight ? (philosopher.getNumber()+1) % chopsticks.size() : philosopher.getNumber();
-    while(count == 0 || (count == 1 && !isRight && chopsticks[number].getUsedBy() != nullptr)) {
-        //wait on the mutex until notify is called
-        cv.wait(lock);
-    }
+    cv.wait(lock, [this, isRight, number]{return (count >1 || (count == 1 && isRight)) && chopsticks[number].getUsedBy() == nullptr;});
     chopsticks[number].setUsedBy(&philosopher);
     count--;
 }
@@ -23,7 +20,8 @@ void Waiter::returnChopstick(int number) {
     chopsticks[number].setUsedBy(nullptr);
     count++;
     //notify the waiting thread
-    cv.notify_one();
+    lock.unlock();
+    cv.notify_all();
 }
 
 void Waiter::returnChopsticks(int philosopherNumber) {

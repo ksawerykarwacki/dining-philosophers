@@ -16,3 +16,7 @@ Philosopher *Chopstick::getUsedBy() {
 void Chopstick::setUsedBy(Philosopher *usedBy) {
     Chopstick::usedBy = usedBy;
 }
+
+std::string Chopstick::getName() {
+    return "Chopstick no. " + std::to_string(this->number);
+}

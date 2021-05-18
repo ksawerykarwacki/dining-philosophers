@@ -38,8 +38,7 @@ enum States {
     waitingForLeftChopstick = 1,
     waitingForRightChopstick = 2,
     eating = 3,
-    thinking = 4,
-    waitingForOthers = 5
+    thinking = 4
 };
 
 #endif //DINING_PHILOSOPHERS_PHILOSOPHER_H

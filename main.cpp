@@ -61,7 +61,7 @@ void writeState() {
         {
             move(numberOfPhilosophers + 4 + i,0);
             attron(COLOR_PAIR(5));
-            printw("Chopstick no. %d",i);
+            printw("%s",chopsticks[i].getName().c_str());
             attron(COLOR_PAIR(2));
             printw(" is used by ");
             attron(COLOR_PAIR(4));
@@ -111,16 +111,14 @@ void writeState() {
 int main() {
     for(int i = 0; i < numberOfPhilosophers; i++)
     {
-        chopsticks.push_back(Chopstick(i));
+        chopsticks.emplace_back(i);
     }
 
     Waiter waiter = Waiter(numberOfPhilosophers, chopsticks, philosophers);
 
-    vector <thread> watki;
-
     for(int i = 0; i < numberOfPhilosophers; i++)
     {
-        philosophers.push_back(Philosopher(i, shouldBreak, waiter));
+        philosophers.emplace_back(i, shouldBreak, waiter);
     }
 
     initscr();
@@ -136,16 +134,18 @@ int main() {
     init_pair(5, COLOR_BLUE, COLOR_BLACK);
     init_pair(6, COLOR_BLACK, COLOR_WHITE);
 
-    watki.push_back(thread(&listenForKey));
-    watki.push_back(thread(&writeState));
+    vector <thread> threads;
+
+    threads.emplace_back(&listenForKey);
+    threads.emplace_back(&writeState);
     for(int i = 0; i < numberOfPhilosophers; i++)
     {
-        watki.push_back(thread (&Philosopher::feast, &philosophers[i]));
+        threads.emplace_back(&Philosopher::feast, &philosophers[i]);
     }
 
-    for(int i = 0; i < watki.size(); i++)
+    for(int i = 0; i < threads.size(); i++)
     {
-        watki[i].join();
+        threads[i].join();
     }
 
     endwin();
